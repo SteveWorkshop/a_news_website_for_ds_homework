@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mynews.mapper.UserMapper">
+    <resultMap id="UserEntityMap" type="com.example.mynews.entity.User">
+        <id column="uid" property="uid"/>
+        <result column="utypeid" property="utypeid"/>
+        <result column="username" property="username"/>
+        <result column="password" property="password"/>
+        <result column="salt" property="salt"/>
+        <result column="email" property="email"/>
+        <result column="gender" property="gender"/>
+        <result column="avatar" property="avatar"/>
+        <result column="is_delete" property="isDelete"/>
+        <result column="created_user" property="createdUser"/>
+        <result column="created_time" property="createdTime"/>
+        <result column="modified_user" property="modifiedUser"/>
+        <result column="modified_time" property="modifiedTime"/>
+    </resultMap>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="uid">
+        insert into t_user( utypeid, 
+                           username, 
+                           password, 
+                           salt, 
+                           email, 
+                           gender, 
+                           avatar, 
+                           is_delete, 
+                           created_user, 
+                           created_time, 
+                           modified_user, 
+                           modified_time)
+        values (#{utypeid},
+                #{username},
+                #{password},
+                #{salt},
+                #{email},
+                #{gender},
+                #{avatar},
+                #{isDelete},
+                #{createdUser},
+                #{createdTime},
+                #{modifiedUser},
+                #{modifiedTime})
+    </insert>
+
+    <select id="findByUsername" resultMap="UserEntityMap">
+        select * from t_user where username=#{username}
+    </select>
+    
+    <select id="findVOByUserName" resultType="com.example.mynews.vo.UserVO">
+        select user.uid,
+               usertype.type_name,
+               user.username,
+               user.email,
+               user.gender,
+               user.avatar,
+               user.is_delete
+        from t_user user,t_usertype usertype
+        where user.utypeid=usertype.utypeid
+        and user.username=#{username}
+    </select>
+    
+    <update id="updatePasswordByUid">
+        UPDATE
+            t_user
+        SET
+            password = #{password},
+            modified_user = #{modifiedUser},
+            modified_time = #{modifiedTime}
+        WHERE
+            uid = #{uid}
+    </update>
+
+    <select id="findByUid" resultMap="UserEntityMap">
+        select * from t_user
+        where uid=#{uid}
+    </select>
+
+    <select id="findVOByUid" resultType="com.example.mynews.vo.UserVO">
+        select user.uid,
+               usertype.type_name,
+               user.username,
+               user.email,
+               user.gender,
+               user.avatar,
+               user.is_delete
+        from t_user user,t_usertype usertype
+        where user.utypeid=usertype.utypeid
+          and user.uid=#{uid}
+    </select>
+
+    <update id="updateInfoByUid">
+        UPDATE
+        t_user
+        SET
+        <if test="utypeid != null">utypeid=#{utypeid}</if>
+        <if test="email != null">email = #{email},</if>
+        <if test="gender != null">gender = #{gender},</if>
+        modified_user = #{modifiedUser},
+        modified_time = #{modifiedTime}
+        WHERE
+        uid = #{uid}
+    </update>
+
+    <update id="updateAvatarByUid">
+        UPDATE
+            t_user
+        SET
+            avatar = #{avatar},
+            modified_user = #{modifiedUser},
+            modified_time = #{modifiedTime}
+        WHERE
+            uid = #{uid}
+    </update>
+
+    <update id="deleteByUid">
+        update t_user
+        set is_delete=1
+        where uid=#{uid}
+    </update>
+</mapper>

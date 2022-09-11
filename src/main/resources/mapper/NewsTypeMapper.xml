@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mynews.mapper.NewsTypeMapper">
+    <resultMap id="NewsTypeEntityMap" type="com.example.mynews.entity.NewsType">
+        <id column="ntypeid" property="ntypeid"/>
+        <result column="type_name" property="typeName"/>
+        <result column="created_user" property="createdUser"/>
+        <result column="created_time" property="createdTime"/>
+        <result column="modified_user" property="modifiedUser"/>
+        <result column="modified_time" property="modifiedTime"/>
+    </resultMap>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="ntypeid">
+        insert into t_newstype(type_name, created_user, created_time, modified_user, modified_time)
+        values (#{typeName},#{createdUser},#{createdTime},#{modifiedUser},#{modifiedTime})
+    </insert>
+
+    <select id="findByNtypeid" resultMap="NewsTypeEntityMap">
+        select * from t_newstype
+        where ntypeid=#{ntypeid}
+    </select>
+
+    <select id="findAll" resultMap="NewsTypeEntityMap">
+        select * from t_newstype
+    </select>
+
+    <update id="updateTypeNameByNtypeid">
+        update t_newstype
+        set type_name=#{typeName},
+            modified_user=#{modifiedUser},
+            modified_time=#{modifiedTime}
+        where ntypeid=#{ntypeid}
+    </update>
+</mapper>

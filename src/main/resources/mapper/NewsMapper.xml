@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mynews.mapper.NewsMapper">
+    <resultMap id="NewsEntityMap" type="com.example.mynews.entity.News">
+        <id column="nid" property="nid"/>
+        <result column="ntypeid" property="ntypeid"/>
+        <result column="news_title" property="newsTitle"/>
+        <result column="news_content" property="newsContent"/>
+        <result column="news_image" property="newsImage"/>
+        <result column="is_delete" property="isDelete"/>
+        <result column="created_user" property="createdUser"/>
+        <result column="created_time" property="createdTime"/>
+        <result column="modified_user" property="modifiedUser"/>
+        <result column="modified_time" property="modifiedTime"/>
+    </resultMap>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="nid">
+        insert into t_news(ntypeid, news_title, news_content, news_image, is_delete, created_user, created_time, modified_user, modified_time)
+        values (#{ntypeid},#{newsTitle},#{newsContent},#{newsImage},#{isDelete},#{createdUser},#{createdTime},#{modifiedUser},#{modifiedTime})
+    </insert>
+
+    <select id="getAll" resultMap="NewsEntityMap">
+        select * from t_news
+        where is_delete=0
+    </select>
+
+    <select id="getAllVO" resultType="com.example.mynews.vo.NewsVO">
+        select news.nid,newstype.type_name,news.news_title,news.news_content,news.news_image,news.modified_user,news.modified_time
+        from t_news news,t_newstype newstype
+        where news.ntypeid=newstype.ntypeid
+        and news.is_delete=0
+    </select>
+
+    <select id="getPage" resultMap="NewsEntityMap">
+        select * from t_news
+        where is_delete=0
+        order by modified_time desc
+        limit #{start},#{end}
+    </select>
+
+    <select id="getVOPage" resultType="com.example.mynews.vo.NewsVO">
+        select news.nid,newstype.type_name,news.news_title,news.news_content,news.news_image,news.modified_user,news.modified_time
+        from t_news news,t_newstype newstype
+        where news.ntypeid=newstype.ntypeid
+        and news.is_delete=0
+        limit #{start},#{end}
+    </select>
+
+    <select id="getVOPageByTypeName" resultType="com.example.mynews.vo.NewsVO">
+        select news.nid,newstype.type_name,news.news_title,news.news_content,news.news_image,news.modified_user,news.modified_time
+        from t_news news,t_newstype newstype
+        where news.ntypeid=newstype.ntypeid
+        and news.is_delete=0
+        and newstype.type_name=#{typeName}
+        limit #{start},#{end}
+    </select>
+
+    <select id="getNewsCount" resultType="int">
+        select count(*) from t_news
+        where to_days(modified_time)=to_days(#{date})
+        and is_delete=0
+    </select>
+
+    <update id="updateInfoByNid">
+        update t_news
+        set
+        <if test="ntypeid!=null">ntypeid=#{ntypeid},</if>
+        <if test="newsTitle!=null">news_title=#{newsTitle},</if>
+        <if test="newsContent!=null">news_content=#{newsContent},</if>
+        <if test="newsImage!=null">news_image=#{newsImage}</if>
+        where nid=#{nid}
+    </update>
+
+    <select id="getRandomVOByType" resultType="com.example.mynews.vo.NewsVO">
+        select news.nid,newstype.type_name,news.news_title,news.news_content,news.news_image,news.modified_user,news.modified_time
+        from t_news news,t_newstype newstype
+        where news.ntypeid=newstype.ntypeid
+          and news.is_delete=0
+          and newstype.type_name=#{typeName}
+          AND news.nid >= (SELECT FLOOR( MAX(t_news.nid) * RAND()) FROM t_news)
+        ORDER BY news.nid LIMIT #{num};
+    </select>
+
+    <update id="deleteByNid">
+        update t_news
+        set is_delete=1
+        where nid=#{nid}
+    </update>
+
+    <select id="getById" resultMap="NewsEntityMap">
+        select news.nid,newstype.type_name,news.news_title,news.news_content,news.news_image,news.modified_user,news.modified_time
+        from t_news news,t_newstype newstype
+        where news.ntypeid=newstype.ntypeid
+          and news.is_delete=0
+        and news.nid=#{nid}
+    </select>
+</mapper>
